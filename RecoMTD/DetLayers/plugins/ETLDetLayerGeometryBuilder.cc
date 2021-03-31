@@ -66,10 +66,7 @@ pair<vector<DetLayer*>, vector<DetLayer*> > ETLDetLayerGeometryBuilder::buildLay
       }
     }
   }
-  //
-  // the first entry is Z+ ( MTD side 1), the second is Z- (MTD side 0)
-  //
-  pair<vector<DetLayer*>, vector<DetLayer*> > res_pair(result[1], result[0]);
+  pair<vector<DetLayer*>, vector<DetLayer*> > res_pair(result[0], result[1]);
   return res_pair;
 }
 
@@ -215,5 +212,14 @@ MTDDetSector* ETLDetLayerGeometryBuilder::makeDetSector(vector<const GeomDet*>& 
 }
 
 bool ETLDetLayerGeometryBuilder::orderGeomDets(const GeomDet*& gd1, const GeomDet*& gd2) {
-  return gd1->geographicalId().rawId() < gd2->geographicalId().rawId();
+    
+    ETLDetId det1(gd1->geographicalId().rawId());
+    ETLDetId det2(gd2->geographicalId().rawId());
+
+    if(det1.modType()!=det2.modType()){
+        return det1.modType() < det2.modType();
+    }else{
+        return det1.module() < det2.module();
+    }
+
 }
