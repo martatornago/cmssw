@@ -1,4 +1,4 @@
-//#define EDM_ML_DEBUG
+#define EDM_ML_DEBUG
 
 #include "RecoMTD/DetLayers/interface/MTDDetSector.h"
 #include "DataFormats/ForwardDetId/interface/ETLDetId.h"
@@ -133,9 +133,7 @@ uint32_t MTDDetSector::ShiftedModuleIndex(uint32_t DetId, int horizontalShift, i
     uint32_t module = start_mod.module();
     uint32_t modtyp = start_mod.modType();
     uint32_t discside = start_mod.discSide();
-    
     std::pair<uint32_t, uint32_t> pair = ModuleIndex(DetId);
-    
     uint32_t row_init, row, global_row_init, global_row, column;
 
     if(horizontalShift<0 && abs(horizontalShift)>pair.first){
@@ -143,10 +141,8 @@ uint32_t MTDDetSector::ShiftedModuleIndex(uint32_t DetId, int horizontalShift, i
     }else{
         column = pair.first + horizontalShift;
     }
-
     
     double offset_init;
-    
     global_row_init = pair.second;
     global_row = global_row_init + verticalShift;
     
@@ -230,10 +226,16 @@ uint32_t MTDDetSector::ShiftedModuleIndex(uint32_t DetId, int horizontalShift, i
         id = module;
     }else{
         if(discside==0){
-            id = module+517;
-        }else{
-            id = module+514;
+            id = module+515;
+            if(id>1031){
+                return 0;
             }
+        }else{
+            id = module+511;
+            if(id>1024){
+                return 0;
+            }
+          }
         }
     
     return id;
@@ -284,62 +286,52 @@ vector<GeometricSearchDet::DetWithState> MTDDetSector::compatibleDets(const Traj
                              << std::sqrt(dist2) << " Min idet/dist = " << std::setw(8) << idetMin << " "
                              << std::setw(10) << std::sqrt(dist2Min) << " " << theDets[idet]->position();
   }
-
-  // loop on an interval od ordered detIds around the minimum
-  // set a range of GeomDets around the minimum compatible with the geometry of ETL
-
-    std::vector<size_t> detsMatrix;
-
-//look for the compatibledets inside a matrix with matrixSizexmatrixSize dimension
-    for(int vertShift = -matrixSize; vertShift<int(matrixSize+1); vertShift++){
-        for(int horShift = -matrixSize; horShift<int(matrixSize+1); horShift++){
-            if(vertShift!=0 || horShift!=0){
-                detsMatrix.push_back(ShiftedModuleIndex(theDets[idetMin]->geographicalId().rawId(), horShift, vertShift));
-            }
-        }
-    }
-    
-    for (size_t det=0; det<detsMatrix.size(); det++) {
-      if (add(detsMatrix[det], result, tsos, prop, est)) {
-        LogTrace("MTDDetLayers") << "MTDDetSector::compatibleDets found compatible det " << detsMatrix[det]
-                                 << " detId = " << theDets[detsMatrix[det]]->geographicalId().rawId() << " at "
-                                 << theDets[detsMatrix[det]]->position() << " dist = " << std::sqrt(tmpDets[detsMatrix[det]].first);
-      }
-    }
     
 //look for the compatibledets considering each line of the sector
     
-//    size_t upShift=1;
-//    size_t downShift=-1;
-//    bool isCompatibleUp=1;
-//    bool isCompatibleDown=1;
-//
-//    size_t idetMinNew = 0;
-//    size_t idetMinUp = 0;
-//    size_t idetMinDown = 0;
-//
-//    compatibleDetsLine(idetMin, detsMatrix, result, tsos, prop, est, idetMinNew);
-//
-//    while(isCompatibleUp){
-//        idetMinUp = ShiftedModuleIndex(idetMinNew,0,upShift);
-//        if(add(idetMinUp, result, tsos, prop, est)){
-//            detsMatrix.push_back(idetMinUp);
-//            compatibleDetsLine(idetMinUp, detsMatrix, result, tsos, prop, est, idetMinNew);
-//            upShift ++;
-//        }else{
-//            isCompatibleUp = 0;
-//        }
-//      }
-//    while(isCompatibleDown){
-//        idetMinDown = ShiftedModuleIndex(idetMinNew,0,downShift);
-//        if(add(idetMinDown, result, tsos, prop, est)){
-//            detsMatrix.push_back(idetMinDown);
-//            compatibleDetsLine(idetMinDown, detsMatrix, result, tsos, prop, est, idetMinNew);
-//            downShift +=-1;
-//        }else{
-//            isCompatibleDown = 0;
-//        }
-//      }
+    if(add(idetMin, result, tsos, prop, est)){
+        LogTrace("MTDDetLayers") << "MTDDetSector::compatibleDets found compatible det idetMin " << idetMin
+                                 << " detId = " << theDets[idetMin]->geographicalId().rawId() << " at "
+                                 << theDets[idetMin]->position();
+        size_t upShift=1;
+        size_t downShift=-1;
+        bool isCompatibleUp=1;
+        bool isCompatibleDown=1;
+        size_t idetMinNew = 0;
+        size_t idetMinUp = 0;
+        size_t idetMinDown = 0;
+
+        compatibleDetsLine(idetMin, result, tsos, prop, est, idetMinNew);
+
+        while(isCompatibleUp){
+            idetMinUp = ShiftedModuleIndex(theDets[idetMinNew]->geographicalId().rawId(),0,upShift);
+            LogTrace("MTDDetLayers") << "MTDDetSector::compatibleDets trying compatible det up " << idetMinUp;
+            if(idetMinUp!=0){
+                if(add(idetMinUp, result, tsos, prop, est)){
+                    compatibleDetsLine(idetMinUp, result, tsos, prop, est, idetMinNew);
+                    upShift ++;
+                }else{
+                    isCompatibleUp = 0;
+                }
+            }else{
+                isCompatibleUp = 0;
+            }
+          }
+        while(isCompatibleDown){
+            idetMinDown = ShiftedModuleIndex(theDets[idetMinNew]->geographicalId().rawId(),0,downShift);
+            LogTrace("MTDDetLayers") << "MTDDetSector::compatibleDets trying compatible det down " << idetMinDown;
+            if(idetMinDown!=0){
+                if(add(idetMinDown, result, tsos, prop, est)){
+                    compatibleDetsLine(idetMinDown, result, tsos, prop, est, idetMinNew);
+                    downShift +=-1;
+                }else{
+                    isCompatibleDown = 0;
+                }
+            }else{
+                isCompatibleDown = 0;
+            }
+        }
+    }
     
 #ifdef EDM_ML_DEBUG
   if (result.empty()) {
@@ -395,41 +387,56 @@ std::ostream& operator<<(std::ostream& os, const MTDDetSector& id) {
   return os;
 }
 
-//void MTDDetSector::compatibleDetsLine(size_t idetMin,
-//                                      std::vector<size_t> detsMatrix,
-//                                      vector<DetWithState>& result,
-//                                      const TrajectoryStateOnSurface& tsos,
-//                                      const Propagator& prop,
-//                                      const MeasurementEstimator& est,
-//                                      size_t idetMinNew) const {
-//    size_t negShift=-1;
-//    size_t posShift=1;
-//    size_t maxNegidet=0;
-//    size_t maxPosidet=0;
-//    bool isCompatiblePos=1;
-//    bool isCompatibleNeg=1;
-//
-//    while(isCompatiblePos){
-//        if (add(idetMin+posShift, result, tsos, prop, est)){
-//            detsMatrix.push_back(idetMin+posShift);
-//            maxPosidet = idetMin+posShift;
-//            posShift ++;
-//        }else{
-//            isCompatiblePos = 0;
-//        }
-//    }
-//    
-//    while(isCompatibleNeg){
-//        if (add(idetMin+negShift, result, tsos, prop, est)){
-//            detsMatrix.push_back(idetMin+negShift);
-//            maxNegidet = idetMin+negShift;
-//            negShift +=-1;
-//        }else{
-//            isCompatibleNeg = 0;
-//        }
-//    }
-//    
-//    idetMinNew = size_t((maxPosidet-maxNegidet)/2);
-//
-//    
-//}
+void MTDDetSector::compatibleDetsLine(size_t idetMin,
+                                      vector<DetWithState>& result,
+                                      const TrajectoryStateOnSurface& tsos,
+                                      const Propagator& prop,
+                                      const MeasurementEstimator& est,
+                                      size_t idetMinNew) const {
+    size_t negShift=-1;
+    size_t posShift=1;
+    size_t maxNegidet=0;
+    size_t maxPosidet=0;
+    bool isCompatiblePos=1;
+    bool isCompatibleNeg=1;
+    size_t idetTmpPos = 0;
+    size_t idetTmpNeg = 0;
+    
+        while(isCompatiblePos){
+            idetTmpPos = ShiftedModuleIndex(theDets[idetMin]->geographicalId().rawId(),posShift,0);
+            if(idetTmpPos!=0){
+                LogTrace("MTDDetLayers") << "MTDDetSector::compatibleDets trying compatible det pos " << idetTmpPos;
+                if (add(idetTmpPos, result, tsos, prop, est)){
+                    LogTrace("MTDDetLayers") << "MTDDetSector::compatibleDets found compatible det pos " << idetTmpPos
+                                             << " detId = " << theDets[idetTmpPos]->geographicalId().rawId() << " at "
+                                             << theDets[idetTmpPos]->position();
+                    maxPosidet = idetTmpPos;
+                    posShift ++;
+                }else{
+                    isCompatiblePos = 0;
+                }
+            }else{
+                isCompatiblePos = 0;
+            }
+        }
+        while(isCompatibleNeg){
+            idetTmpNeg = ShiftedModuleIndex(theDets[idetMin]->geographicalId().rawId(),negShift,0);
+            if(idetTmpNeg!=0){
+                LogTrace("MTDDetLayers") << "MTDDetSector::compatibleDets trying compatible det neg " << idetTmpNeg;
+                if (add(idetTmpNeg, result, tsos, prop, est)){
+                    LogTrace("MTDDetLayers") << "MTDDetSector::compatibleDets found compatible det neg " << idetTmpNeg
+                                             << " detId = " << theDets[idetTmpNeg]->geographicalId().rawId() << " at "
+                                             << theDets[idetTmpNeg]->position();
+                    maxNegidet = idetTmpNeg;
+                    negShift +=-1;
+                }else{
+                    isCompatibleNeg = 0;
+                }
+            }else{
+                isCompatibleNeg = 0;
+            }
+        }
+        
+        idetMinNew += size_t((maxPosidet-maxNegidet)/2);
+    
+}

@@ -53,13 +53,12 @@ public:
    
   uint32_t ShiftedModuleIndex(uint32_t, int, int) const;
 
-//  void compatibleDetsLine(size_t idetMin,
-//                                        std::vector<size_t> detsMatrix,
-//                                        std::vector<DetWithState>& result,
-//                                        const TrajectoryStateOnSurface& tsos,
-//                                        const Propagator& prop,
-//                                        const MeasurementEstimator& est,
-//                                        size_t idetMinNew) const;
+  void compatibleDetsLine(size_t idetMin,
+                          std::vector<DetWithState>& result,
+                          const TrajectoryStateOnSurface& tsos,
+                          const Propagator& prop,
+                          const MeasurementEstimator& est,
+                          size_t idetMinNew) const;
 
 protected:
   void setDisk(BoundDiskSector* diskS) { theDiskS = diskS; }
@@ -79,14 +78,11 @@ private:
   // value 50 based on the possible mismatch of module number between adjacent
   // modules, due to left-right type imparity
 
-  static constexpr size_t detsRange = 50;
-
   void init();
     
   const double x_offset = 22.55;  //all constants in mm
   const double sensor_module_x = 43.1;
   const double deltaX = 0.5;
-  const uint32_t matrixSize = 2;
     
   std::vector<double> offset_FR = {x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset+5*(sensor_module_x+deltaX), x_offset+6*(sensor_module_x+deltaX), x_offset+7*(sensor_module_x+deltaX), x_offset+8*(sensor_module_x+deltaX), x_offset+8*(sensor_module_x+deltaX), x_offset+7*(sensor_module_x+deltaX), x_offset+6*(sensor_module_x+deltaX), x_offset+2*(sensor_module_x+deltaX), x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,0};
   std::vector<double> offset_FL = {0, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset+2*(sensor_module_x+deltaX), x_offset+6*(sensor_module_x+deltaX), x_offset+7*(sensor_module_x+deltaX), x_offset+8*(sensor_module_x+deltaX), x_offset+8*(sensor_module_x+deltaX), x_offset+7*(sensor_module_x+deltaX), x_offset+6*(sensor_module_x+deltaX), x_offset+5*(sensor_module_x+deltaX), x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, 0};
