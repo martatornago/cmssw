@@ -292,7 +292,7 @@ vector<GeometricSearchDet::DetWithState> MTDDetSector::compatibleDets(const Traj
         size_t idetMinNewDown = idetMinNew;
         while(isCompatibleUp){
             idetMinUp = ShiftedModuleIndex(theDets[idetMinNew]->geographicalId().rawId(),0,upShift) -1;
-            if(idetMinUp<0){
+            if(idetMinUp>=0){
                 if(add(idetMinUp, result, tsos, prop, est)){
                     LogTrace("MTDDetLayers") << "MTDDetSector::compatibleDets found compatible det up " << idetMinUp << " detId = " << theDets[idetMinUp]->geographicalId().rawId() << " at "
                     << theDets[idetMinUp]->position() << " dist = " << std::sqrt((startPos - theDets[idetMinUp]->position()).mag2());
@@ -307,7 +307,7 @@ vector<GeometricSearchDet::DetWithState> MTDDetSector::compatibleDets(const Traj
           }
         while(isCompatibleDown){
             idetMinDown = ShiftedModuleIndex(theDets[idetMinNewDown]->geographicalId().rawId(),0,downShift) -1;
-            if(idetMinDown<0){
+            if(idetMinDown>=0){
                 if(add(idetMinDown, result, tsos, prop, est)){
                     LogTrace("MTDDetLayers") << "MTDDetSector::compatibleDets found compatible det down " << idetMinDown << " detId = " << theDets[idetMinDown]->geographicalId().rawId() << " at "
                     << theDets[idetMinDown]->position() << " dist = " << std::sqrt((startPos - theDets[idetMinDown]->position()).mag2());
@@ -393,7 +393,7 @@ size_t MTDDetSector::compatibleDetsLine(size_t idetMin,
 
     while(isCompatiblePos){
             idetTmpPos = ShiftedModuleIndex(theDets[idetMin]->geographicalId().rawId(),posShift,0)-1;
-            if(idetTmpPos<0){
+            if(idetTmpPos>=0){
                 if (add(idetTmpPos, result, tsos, prop, est)){
                     LogTrace("MTDDetLayers") << "MTDDetSector::compatibleDets found compatible det pos " << idetTmpPos
                                              << " detId = " << theDets[idetTmpPos]->geographicalId().rawId() << " at "
@@ -409,7 +409,7 @@ size_t MTDDetSector::compatibleDetsLine(size_t idetMin,
         }
         while(isCompatibleNeg){
             idetTmpNeg = ShiftedModuleIndex(theDets[idetMin]->geographicalId().rawId(),negShift,0) -1;
-            if(idetTmpNeg<0){
+            if(idetTmpNeg>=0){
                 if (add(idetTmpNeg, result, tsos, prop, est)){
                     LogTrace("MTDDetLayers") << "MTDDetSector::compatibleDets found compatible det neg " << idetTmpNeg
                                              << " detId = " << theDets[idetTmpNeg]->geographicalId().rawId() << " at "
