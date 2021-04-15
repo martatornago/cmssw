@@ -73,14 +73,18 @@ std::pair<uint32_t, uint32_t> MTDDetSector::ModuleIndex(uint32_t DetId) const {
  if(disc_side == 0){
   if( sensor_type == 2 ){
    for( int i=0; i<27; i++ ){
-       if( start_copy_FR[i]<=c && start_copy_FR[i+1]>c ){
+       if(c>=start_copy_FR[26]){
+           row=26;
+       }else if( start_copy_FR[i]<=c && start_copy_FR[i+1]>c ){
            row = i;
        }
    }
    column = c - start_copy_FR[row];
   }else{
    for( int i=0; i<27; i++ ){
-       if( start_copy_FL[i]<=c && start_copy_FL[i+1]>c ){
+       if(c>=start_copy_FL[26]){
+           row=26;
+       }else if( start_copy_FL[i]<=c && start_copy_FL[i+1]>c ){
            row = i;
        }
    }
@@ -89,14 +93,18 @@ std::pair<uint32_t, uint32_t> MTDDetSector::ModuleIndex(uint32_t DetId) const {
  }else{
   if( sensor_type == 2 ){
    for( int i=0; i<27; i++ ){
-       if( start_copy_BR[i]<=c && start_copy_BR[i+1]>c ){
+       if(c>=start_copy_BR[26]){
+           row=26;
+       }else if( start_copy_BR[i]<=c && start_copy_BR[i+1]>c ){
            row = i;
        }
    }
    column = c - start_copy_BR[row];
   }else{
    for( int i=0; i<27; i++ ){
-       if( start_copy_BL[i]<=c && start_copy_BL[i+1]>c ){
+       if(c>=start_copy_BL[26]){
+           row=26;
+       }else if( start_copy_BL[i]<=c && start_copy_BL[i+1]>c ){
            row = i;
        }
    }
@@ -134,6 +142,10 @@ uint32_t MTDDetSector::ShiftedModuleIndex(uint32_t DetId, int horizontalShift, i
     column = pair.first + horizontalShift;
     global_row_init = pair.second;
     global_row = global_row_init + verticalShift;
+    
+    if(global_row<0 || global_row>=54){
+        return 0;
+    }
     
     if(discside == 0){
         if(global_row_init%2==0){
@@ -175,7 +187,11 @@ uint32_t MTDDetSector::ShiftedModuleIndex(uint32_t DetId, int horizontalShift, i
                 if(offset_init!=offset_FL[row+1]){
                     module += (offset_init - offset_FL[row])/(sensor_module_x + deltaX);
                 }
-                if(module>=start_copy_FL[row+1] || module<start_copy_FL[row]) return 0;
+                if(row==26){
+                    if(module>lastModule_frontLeft){
+                        return 0;
+                    }
+                }else if(module>=start_copy_FL[row+1] || module<start_copy_FL[row]) return 0;
             }
         }else{
             if(row>=27 || row<0) return 0;
@@ -184,7 +200,11 @@ uint32_t MTDDetSector::ShiftedModuleIndex(uint32_t DetId, int horizontalShift, i
                 if(offset_init!=offset_FR[row]){
                     module += (offset_init - offset_FR[row])/(sensor_module_x + deltaX);
                 }
-                if(module>=start_copy_FR[row+1] || module<start_copy_FR[row]) return 0;
+                if(row==26){
+                    if(module>lastModule_frontRight){
+                        return 0;
+                    }
+                }else if(module>=start_copy_FR[row+1] || module<start_copy_FR[row]) return 0;
             }
         }
     }else{
@@ -195,7 +215,11 @@ uint32_t MTDDetSector::ShiftedModuleIndex(uint32_t DetId, int horizontalShift, i
                 if(offset_init!=offset_BL[row]){
                     module += (offset_init - offset_BL[row])/(sensor_module_x + deltaX);
                 }
-                if(module>=start_copy_BL[row+1] || module<start_copy_BL[row]) return 0;
+                if(row==26){
+                    if(module>lastModule_backLeft){
+                        return 0;
+                    }
+                }else if(module>=start_copy_BL[row+1] || module<start_copy_BL[row]) return 0;
             }
         }else{
             if(row>=27 || row<0) return 0;
@@ -204,7 +228,11 @@ uint32_t MTDDetSector::ShiftedModuleIndex(uint32_t DetId, int horizontalShift, i
                 if(offset_init!=offset_BR[row]){
                     module += (offset_init - offset_BR[row])/(sensor_module_x + deltaX);
                 }
-                if(module>=start_copy_BR[row+1] || module<start_copy_BR[row]) return 0;
+                if(row==26){
+                    if(module>lastModule_backRight){
+                        return 0;
+                    }
+                }else if(module>=start_copy_BR[row+1] || module<start_copy_BR[row]) return 0;
             }
         }
     }
@@ -216,18 +244,18 @@ uint32_t MTDDetSector::ShiftedModuleIndex(uint32_t DetId, int horizontalShift, i
     }else{
         if(discside==0){
             id = module+lastModule_frontLeft;
-            if(id>lastModule_frontRight){
+            if(id>lastModule_front){
                 return 0;
             }
         }else{
             id = module+lastModule_backLeft;
-            if(id>lastModule_backRight){
+            if(id>lastModule_back){
                 return 0;
             }
           }
         }
     
-    return id;
+    return id-1;
 }
 
 
@@ -285,18 +313,17 @@ vector<GeometricSearchDet::DetWithState> MTDDetSector::compatibleDets(const Traj
         size_t downShift=-1;
         bool isCompatibleUp=true;
         bool isCompatibleDown=true;
-        size_t idetMinUp = 0;
-        size_t idetMinDown = 0;
+        int idetMinUp = idetMin;
+        int idetMinDown = idetMin;
 
-        size_t idetMinNew = compatibleDetsLine(idetMin, result, tsos, prop, est, startPos);
-        size_t idetMinNewDown = idetMinNew;
+        compatibleDetsLine(idetMin, result, tsos, prop, est, startPos);
         while(isCompatibleUp){
-            idetMinUp = ShiftedModuleIndex(theDets[idetMinNew]->geographicalId().rawId(),0,upShift) -1;
-            if(idetMinUp>=0){
+            idetMinUp = ShiftedModuleIndex(theDets[idetMin]->geographicalId().rawId(),0,upShift);
+            if(idetMinUp!=0){
                 if(add(idetMinUp, result, tsos, prop, est)){
                     LogTrace("MTDDetLayers") << "MTDDetSector::compatibleDets found compatible det up " << idetMinUp << " detId = " << theDets[idetMinUp]->geographicalId().rawId() << " at "
                     << theDets[idetMinUp]->position() << " dist = " << std::sqrt((startPos - theDets[idetMinUp]->position()).mag2());
-                    idetMinNew = compatibleDetsLine(idetMinUp, result, tsos, prop, est, startPos);
+                    compatibleDetsLine(idetMinUp, result, tsos, prop, est, startPos);
                     upShift ++;
                 }else{
                     isCompatibleUp = false;
@@ -306,12 +333,12 @@ vector<GeometricSearchDet::DetWithState> MTDDetSector::compatibleDets(const Traj
             }
           }
         while(isCompatibleDown){
-            idetMinDown = ShiftedModuleIndex(theDets[idetMinNewDown]->geographicalId().rawId(),0,downShift) -1;
-            if(idetMinDown>=0){
+            idetMinDown = ShiftedModuleIndex(theDets[idetMin]->geographicalId().rawId(),0,downShift);
+            if(idetMinDown!=0){
                 if(add(idetMinDown, result, tsos, prop, est)){
                     LogTrace("MTDDetLayers") << "MTDDetSector::compatibleDets found compatible det down " << idetMinDown << " detId = " << theDets[idetMinDown]->geographicalId().rawId() << " at "
                     << theDets[idetMinDown]->position() << " dist = " << std::sqrt((startPos - theDets[idetMinDown]->position()).mag2());
-                    idetMinNewDown = compatibleDetsLine(idetMinDown, result, tsos, prop, est, startPos);
+                    compatibleDetsLine(idetMinDown, result, tsos, prop, est, startPos);
                     downShift +=-1;
                 }else{
                     isCompatibleDown = false;
@@ -376,7 +403,7 @@ std::ostream& operator<<(std::ostream& os, const MTDDetSector& id) {
   return os;
 }
 
-size_t MTDDetSector::compatibleDetsLine(size_t idetMin,
+void MTDDetSector::compatibleDetsLine(size_t idetMin,
                                       vector<DetWithState>& result,
                                       const TrajectoryStateOnSurface& tsos,
                                       const Propagator& prop,
@@ -384,21 +411,21 @@ size_t MTDDetSector::compatibleDetsLine(size_t idetMin,
                                       GlobalPoint startPos) const {
     size_t negShift=-1;
     size_t posShift=1;
-    size_t maxNegidet=idetMin;
-    size_t maxPosidet=idetMin;
+//    size_t maxNegidet=idetMin;
+//    size_t maxPosidet=idetMin;
     bool isCompatiblePos=true;
     bool isCompatibleNeg=true;
     size_t idetTmpPos = 0;
     size_t idetTmpNeg = 0;
 
     while(isCompatiblePos){
-            idetTmpPos = ShiftedModuleIndex(theDets[idetMin]->geographicalId().rawId(),posShift,0)-1;
-            if(idetTmpPos>=0){
+            idetTmpPos = ShiftedModuleIndex(theDets[idetMin]->geographicalId().rawId(),posShift,0);
+            if(idetTmpPos!=0){
                 if (add(idetTmpPos, result, tsos, prop, est)){
                     LogTrace("MTDDetLayers") << "MTDDetSector::compatibleDets found compatible det pos " << idetTmpPos
                                              << " detId = " << theDets[idetTmpPos]->geographicalId().rawId() << " at "
                                              << theDets[idetTmpPos]->position() << " dist = " << std::sqrt((startPos - theDets[idetTmpPos]->position()).mag2());
-                    maxPosidet = idetTmpPos;
+//                    maxPosidet = idetTmpPos;
                     posShift ++;
                 }else{
                     isCompatiblePos = false;
@@ -408,13 +435,13 @@ size_t MTDDetSector::compatibleDetsLine(size_t idetMin,
             }
         }
         while(isCompatibleNeg){
-            idetTmpNeg = ShiftedModuleIndex(theDets[idetMin]->geographicalId().rawId(),negShift,0) -1;
-            if(idetTmpNeg>=0){
+            idetTmpNeg = ShiftedModuleIndex(theDets[idetMin]->geographicalId().rawId(),negShift,0);
+            if(idetTmpNeg!=0){
                 if (add(idetTmpNeg, result, tsos, prop, est)){
                     LogTrace("MTDDetLayers") << "MTDDetSector::compatibleDets found compatible det neg " << idetTmpNeg
                                              << " detId = " << theDets[idetTmpNeg]->geographicalId().rawId() << " at "
                                              << theDets[idetTmpNeg]->position() << " dist = " << std::sqrt((startPos - theDets[idetTmpNeg]->position()).mag2());
-                    maxNegidet = idetTmpNeg;
+//                    maxNegidet = idetTmpNeg;
                     negShift +=-1;
                 }else{
                     isCompatibleNeg = false;
@@ -424,7 +451,7 @@ size_t MTDDetSector::compatibleDetsLine(size_t idetMin,
             }
         }
         
-        return maxNegidet + size_t((maxPosidet-maxNegidet)/2);
-    LogTrace("MTDDetLayers") << "MTDDetSector::compatibleDets idetMinNew " << maxNegidet + size_t((maxPosidet-maxNegidet)/2) << " with maxPosidet " << maxPosidet << " and maxNegidet "<< maxNegidet;
+//        return maxNegidet + size_t((maxPosidet-maxNegidet)/2);
+//    LogTrace("MTDDetLayers") << "MTDDetSector::compatibleDets idetMinNew " << maxNegidet + size_t((maxPosidet-maxNegidet)/2) << " with maxPosidet " << maxPosidet << " and maxNegidet "<< maxNegidet;
     
 }
