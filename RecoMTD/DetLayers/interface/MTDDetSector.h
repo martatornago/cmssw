@@ -53,7 +53,7 @@ public:
    
   uint32_t ShiftedModuleIndex(uint32_t, int, int) const;
 
-  size_t compatibleDetsLine(size_t idetMin,
+  void compatibleDetsLine(size_t idetMin,
                           std::vector<DetWithState>& result,
                           const TrajectoryStateOnSurface& tsos,
                           const Propagator& prop,
@@ -84,9 +84,11 @@ private:
   const double sensor_module_x = 43.1;
   const double deltaX = 0.5;
   const size_t lastModule_backLeft = 512;
-  const size_t lastModule_backRight = 1025;
+  const size_t lastModule_backRight = 513;
+  const size_t lastModule_back = 1025;
   const size_t lastModule_frontLeft = 516;
-  const size_t lastModule_frontRight = 1032;
+  const size_t lastModule_frontRight = 516;
+  const size_t lastModule_front = 1032;
 
     
   std::vector<double> offset_FR = {x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset+5*(sensor_module_x+deltaX), x_offset+6*(sensor_module_x+deltaX), x_offset+7*(sensor_module_x+deltaX), x_offset+8*(sensor_module_x+deltaX), x_offset+8*(sensor_module_x+deltaX), x_offset+7*(sensor_module_x+deltaX), x_offset+6*(sensor_module_x+deltaX), x_offset+2*(sensor_module_x+deltaX), x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset};
