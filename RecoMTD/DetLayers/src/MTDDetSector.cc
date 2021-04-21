@@ -296,9 +296,11 @@ size_t MTDDetSector::ShiftedModuleIndex(uint32_t DetId, int horizontalShift, int
   if (offset_init != offset[row]) {
     module += (offset_init - offset[row]) / (sensor_module_x + deltaX);
   }
-  if (row == halfRowRange - 1 && module > lastModule) {
-      return theDets.size();
-  } else if (module >= start_copy[row + 1] || module < start_copy[row]) {
+    if (row == halfRowRange - 1) {
+        if (module > lastModule || module < start_copy[row]) {
+          return theDets.size();
+        }
+    } else if (module >= start_copy[row + 1] || module < start_copy[row]) {
     return theDets.size();
   }
 
