@@ -241,9 +241,11 @@ size_t MTDDetSector::ShiftedModuleIndex(uint32_t DetId, int horizontalShift, int
 
   std::array<uint32_t, halfRowRange> start_copy;
   std::array<double, halfRowRange> offset;
-  size_t lastModule;
+  size_t lastModule, lastModuleLeft, totalModule;
 
   if (discside == 0) {
+    lastModuleLeft = lastModule_frontLeft;
+    totalModule = lastModule_frontLeft + lastModule_frontRight;
     if (global_row_init % 2 == 0) {
       row_init = global_row_init / 2;  //front right
       offset_init = offset_FR[row_init];
@@ -263,9 +265,10 @@ size_t MTDDetSector::ShiftedModuleIndex(uint32_t DetId, int horizontalShift, int
       start_copy = start_copy_FL;
       offset = offset_FL;
       lastModule = lastModule_frontLeft;
-      
     }
   } else {
+    lastModuleLeft = lastModule_backLeft;
+    totalModule = lastModule_backLeft + lastModule_backRight;
     if (global_row_init % 2 == 0) {
       row_init = global_row_init / 2;  //back left
       offset_init = offset_BL[row_init];
@@ -285,8 +288,8 @@ size_t MTDDetSector::ShiftedModuleIndex(uint32_t DetId, int horizontalShift, int
       start_copy = start_copy_BR;
       offset = offset_BR;
       lastModule = lastModule_backRight;
+      }
     }
-  }
 
   if (row >= static_cast<int>(halfRowRange) || row < 0) {
     return theDets.size();
@@ -305,10 +308,9 @@ size_t MTDDetSector::ShiftedModuleIndex(uint32_t DetId, int horizontalShift, int
   }
 
   size_t id;
-  id = (modtyp == 1) ? module : module + lastModule;
-
-  if ((discside == 0 && module > lastModule_frontLeft + lastModule_frontRight) ||
-      (discside == 1 && module > lastModule_backLeft + lastModule_backRight)) {
+  id = (modtyp == 1) ? module : module + lastModuleLeft;
+    
+  if (module > totalModule) {
     return theDets.size();
   }
 
