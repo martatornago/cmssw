@@ -48,12 +48,12 @@ public:
   // GeometricSearchDet extension
 
   const BoundDiskSector& specificSurface() const { return *theDiskS; }
-    
-  std::pair<uint32_t, uint32_t> ModuleIndex(uint32_t DetId) const;
-   
-  uint32_t ShiftedModuleIndex(uint32_t, int, int) const;
 
-  void compatibleDetsLine(size_t idetMin,
+  std::pair<uint32_t, uint32_t> ModuleIndex(uint32_t DetId) const;
+
+  size_t ShiftedModuleIndex(uint32_t, int, int) const;
+
+  void compatibleDetsLine(const size_t idetMin,
                           std::vector<DetWithState>& result,
                           const TrajectoryStateOnSurface& tsos,
                           const Propagator& prop,
@@ -79,28 +79,137 @@ private:
   // modules, due to left-right type imparity
 
   void init();
-    
-  const double x_offset = 22.55;  //all constants in mm
-  const double sensor_module_x = 43.1;
-  const double deltaX = 0.5;
-  const size_t lastModule_backLeft = 512;
-  const size_t lastModule_backRight = 513;
-  const size_t lastModule_back = 1025;
-  const size_t lastModule_frontLeft = 516;
-  const size_t lastModule_frontRight = 516;
-  const size_t lastModule_front = 1032;
 
-    
-  std::vector<double> offset_FR = {x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset+5*(sensor_module_x+deltaX), x_offset+6*(sensor_module_x+deltaX), x_offset+7*(sensor_module_x+deltaX), x_offset+8*(sensor_module_x+deltaX), x_offset+8*(sensor_module_x+deltaX), x_offset+7*(sensor_module_x+deltaX), x_offset+6*(sensor_module_x+deltaX), x_offset+2*(sensor_module_x+deltaX), x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset};
-  std::vector<double> offset_FL = {x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset+2*(sensor_module_x+deltaX), x_offset+6*(sensor_module_x+deltaX), x_offset+7*(sensor_module_x+deltaX), x_offset+8*(sensor_module_x+deltaX), x_offset+8*(sensor_module_x+deltaX), x_offset+7*(sensor_module_x+deltaX), x_offset+6*(sensor_module_x+deltaX), x_offset+5*(sensor_module_x+deltaX), x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset};
-  std::vector<double> offset_BR = {x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset+3*(sensor_module_x+deltaX), x_offset+6*(sensor_module_x+deltaX), x_offset+7*(sensor_module_x+deltaX), x_offset+7*(sensor_module_x+deltaX), x_offset+8*(sensor_module_x+deltaX), x_offset+7*(sensor_module_x+deltaX), x_offset+6*(sensor_module_x+deltaX), x_offset+4*(sensor_module_x+deltaX), x_offset,x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset};
-  std::vector<double> offset_BL = {x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset+4*(sensor_module_x+deltaX), x_offset+6*(sensor_module_x+deltaX), x_offset+7*(sensor_module_x+deltaX), x_offset+8*(sensor_module_x+deltaX), x_offset+7*(sensor_module_x+deltaX), x_offset+7*(sensor_module_x+deltaX), x_offset+6*(sensor_module_x+deltaX), x_offset+3*(sensor_module_x+deltaX), x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset};
-    
-  std::vector<uint32_t> start_copy_FR = {1, 7, 18, 33, 50, 69, 90, 112, 136, 161, 186, 207, 227, 247, 266, 285, 305, 325, 349, 374, 398, 421, 443, 463, 481, 497, 510};
-  std::vector<uint32_t> start_copy_FL = {1, 8, 21, 37, 55, 75, 97, 120, 144, 169, 193, 213, 233, 252, 271, 291, 311, 332, 357, 382, 406, 428, 449, 468, 485, 500, 511};
-  std::vector<uint32_t> start_copy_BR = {1, 10, 23, 39, 57, 77, 99, 122, 146, 171, 194, 214, 234, 254, 273, 293, 313, 335, 360, 384, 407, 430, 451, 470, 487, 501, 511};
-  std::vector<uint32_t> start_copy_BL = {1, 4, 14, 28, 45, 64, 85, 107, 130, 154, 179, 201, 221, 241, 260, 280, 300, 320, 343, 368, 392, 415, 437, 457, 475, 491, 504};
-    
+  static constexpr double x_offset = 22.55;  //all constants in mm
+  static constexpr double sensor_module_x = 43.1;
+  static constexpr double deltaX = 0.5;
+  static constexpr size_t lastModule_backLeft = 512;
+  static constexpr size_t lastModule_backRight = 513;
+  static constexpr size_t lastModule_frontLeft = 516;
+  static constexpr size_t lastModule_frontRight = 516;
+  static constexpr size_t halfRowRange = 27;  // size of all following vectors
+
+  std::array<double, halfRowRange> offset_FR{{x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset + 5 * (sensor_module_x + deltaX),
+                                              x_offset + 6 * (sensor_module_x + deltaX),
+                                              x_offset + 7 * (sensor_module_x + deltaX),
+                                              x_offset + 8 * (sensor_module_x + deltaX),
+                                              x_offset + 8 * (sensor_module_x + deltaX),
+                                              x_offset + 7 * (sensor_module_x + deltaX),
+                                              x_offset + 6 * (sensor_module_x + deltaX),
+                                              x_offset + 2 * (sensor_module_x + deltaX),
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset}};
+  std::array<double, halfRowRange> offset_FL{{x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset + 2 * (sensor_module_x + deltaX),
+                                              x_offset + 6 * (sensor_module_x + deltaX),
+                                              x_offset + 7 * (sensor_module_x + deltaX),
+                                              x_offset + 8 * (sensor_module_x + deltaX),
+                                              x_offset + 8 * (sensor_module_x + deltaX),
+                                              x_offset + 7 * (sensor_module_x + deltaX),
+                                              x_offset + 6 * (sensor_module_x + deltaX),
+                                              x_offset + 5 * (sensor_module_x + deltaX),
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset}};
+  std::array<double, halfRowRange> offset_BR{{x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset + 3 * (sensor_module_x + deltaX),
+                                              x_offset + 6 * (sensor_module_x + deltaX),
+                                              x_offset + 7 * (sensor_module_x + deltaX),
+                                              x_offset + 7 * (sensor_module_x + deltaX),
+                                              x_offset + 8 * (sensor_module_x + deltaX),
+                                              x_offset + 7 * (sensor_module_x + deltaX),
+                                              x_offset + 6 * (sensor_module_x + deltaX),
+                                              x_offset + 4 * (sensor_module_x + deltaX),
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset}};
+  std::array<double, halfRowRange> offset_BL{{x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset + 4 * (sensor_module_x + deltaX),
+                                              x_offset + 6 * (sensor_module_x + deltaX),
+                                              x_offset + 7 * (sensor_module_x + deltaX),
+                                              x_offset + 8 * (sensor_module_x + deltaX),
+                                              x_offset + 7 * (sensor_module_x + deltaX),
+                                              x_offset + 7 * (sensor_module_x + deltaX),
+                                              x_offset + 6 * (sensor_module_x + deltaX),
+                                              x_offset + 3 * (sensor_module_x + deltaX),
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset,
+                                              x_offset}};
+
+  std::array<uint32_t, halfRowRange> start_copy_FR{{1,   7,   18,  33,  50,  69,  90,  112, 136,
+                                                    161, 186, 207, 227, 247, 266, 285, 305, 325,
+                                                    349, 374, 398, 421, 443, 463, 481, 497, 510}};
+  std::array<uint32_t, halfRowRange> start_copy_FL{{1,   8,   21,  37,  55,  75,  97,  120, 144,
+                                                    169, 193, 213, 233, 252, 271, 291, 311, 332,
+                                                    357, 382, 406, 428, 449, 468, 485, 500, 511}};
+  std::array<uint32_t, halfRowRange> start_copy_BR{{1,   10,  23,  39,  57,  77,  99,  122, 146,
+                                                    171, 194, 214, 234, 254, 273, 293, 313, 335,
+                                                    360, 384, 407, 430, 451, 470, 487, 501, 511}};
+  std::array<uint32_t, halfRowRange> start_copy_BL{{1,   4,   14,  28,  45,  64,  85,  107, 130,
+                                                    154, 179, 201, 221, 241, 260, 280, 300, 320,
+                                                    343, 368, 392, 415, 437, 457, 475, 491, 504}};
 };
 
 std::ostream& operator<<(std::ostream&, const MTDDetSector&);
