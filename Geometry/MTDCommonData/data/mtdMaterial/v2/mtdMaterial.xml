@@ -65,7 +65,95 @@
       <MaterialFraction fraction="0.1">
         <rMaterial name="materials:Carbon fib.str."/>   
       </MaterialFraction>
-    </CompositeMaterial> 
+    </CompositeMaterial>
+    <CompositeMaterial name="Cables1" density="31.02*mg/cm3" symbol="Cables1" method="mixture by weight">
+      <MaterialFraction fraction="0.94">
+        <rMaterial name="materials:Air"/>
+      </MaterialFraction>
+      <MaterialFraction fraction="0.03">
+        <rMaterial name="materials:Copper"/>
+      </MaterialFraction>
+      <MaterialFraction fraction="0.03">
+        <rMaterial name="materials:Foam"/>
+      </MaterialFraction>
+    </CompositeMaterial>
+    <CompositeMaterial name="Cables2" density="57.85*mg/cm3" symbol="Cables2" method="mixture by weight">
+      <MaterialFraction fraction="0.94">
+        <rMaterial name="materials:Air"/>
+      </MaterialFraction>
+      <MaterialFraction fraction="0.03">
+        <rMaterial name="materials:Copper"/>
+      </MaterialFraction>
+      <MaterialFraction fraction="0.03">
+        <rMaterial name="materials:Foam"/>
+      </MaterialFraction>
+    </CompositeMaterial>
+    <CompositeMaterial name="Cables3" density="83.68*mg/cm3" symbol="Cables3" method="mixture by weight">
+      <MaterialFraction fraction="0.94">
+        <rMaterial name="materials:Air"/>
+      </MaterialFraction>
+      <MaterialFraction fraction="0.03">
+        <rMaterial name="materials:Copper"/>
+      </MaterialFraction>
+      <MaterialFraction fraction="0.03">
+        <rMaterial name="materials:Foam"/>
+      </MaterialFraction>
+    </CompositeMaterial>
+    <CompositeMaterial name="Cables4" density="109.5*mg/cm3" symbol="Cables4" method="mixture by weight">
+      <MaterialFraction fraction="0.94">
+        <rMaterial name="materials:Air"/>
+      </MaterialFraction>
+      <MaterialFraction fraction="0.03">
+        <rMaterial name="materials:Copper"/>
+      </MaterialFraction>
+      <MaterialFraction fraction="0.03">
+        <rMaterial name="materials:Foam"/>
+      </MaterialFraction>
+    </CompositeMaterial>
+    <CompositeMaterial name="Cables5" density="135.33*mg/cm3" symbol="Cables5" method="mixture by weight">
+      <MaterialFraction fraction="0.94">
+        <rMaterial name="materials:Air"/>
+      </MaterialFraction>
+      <MaterialFraction fraction="0.03">
+        <rMaterial name="materials:Copper"/>
+      </MaterialFraction>
+      <MaterialFraction fraction="0.03">
+        <rMaterial name="materials:Foam"/>
+      </MaterialFraction>
+    </CompositeMaterial>
+    <CompositeMaterial name="Cables6" density="160.16*mg/cm3" symbol="Cables6" method="mixture by weight">
+      <MaterialFraction fraction="0.94">
+        <rMaterial name="materials:Air"/>
+      </MaterialFraction>
+      <MaterialFraction fraction="0.03">
+        <rMaterial name="materials:Copper"/>
+      </MaterialFraction>
+      <MaterialFraction fraction="0.03">
+        <rMaterial name="materials:Foam"/>
+      </MaterialFraction>
+    </CompositeMaterial>
+    <CompositeMaterial name="Cables7" density="185.98*mg/cm3" symbol="Cables7" method="mixture by weight">
+      <MaterialFraction fraction="0.94">
+        <rMaterial name="materials:Air"/>
+      </MaterialFraction>
+      <MaterialFraction fraction="0.03">
+        <rMaterial name="materials:Copper"/>
+      </MaterialFraction>
+      <MaterialFraction fraction="0.03">
+        <rMaterial name="materials:Foam"/>
+      </MaterialFraction>
+    </CompositeMaterial>
+    <CompositeMaterial name="ETLPatchPanel" density="454*mg/cm3" symbol="ETLPatchPanel" method="mixture by weight">
+      <MaterialFraction fraction="0.4">
+        <rMaterial name="materials:Copper"/>
+      </MaterialFraction>
+      <MaterialFraction fraction="0.1">
+        <rMaterial name="materials:Polyethylene"/>
+      </MaterialFraction>
+      <MaterialFraction fraction="0.5">
+        <rMaterial name="materials:Air"/>
+      </MaterialFraction>
+    </CompositeMaterial>
   </MaterialSection>
 
 </DDDefinition>
