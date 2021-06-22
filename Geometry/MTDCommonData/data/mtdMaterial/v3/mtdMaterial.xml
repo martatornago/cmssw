@@ -66,7 +66,7 @@
         <rMaterial name="materials:Carbon fib.str."/>   
       </MaterialFraction>
     </CompositeMaterial>
-    <CompositeMaterial name="Cables1" density="31.02*mg/cm3" symbol="Cables1" method="mixture by weight">
+    <CompositeMaterial name="Cables1" density="32.34*mg/cm3" symbol="Cables1" method="mixture by weight">
       <MaterialFraction fraction="0.94">
         <rMaterial name="materials:Air"/>
       </MaterialFraction>
@@ -77,8 +77,8 @@
         <rMaterial name="materials:Kevlar"/>
       </MaterialFraction>
     </CompositeMaterial>
-    <CompositeMaterial name="Cables2" density="57.85*mg/cm3" symbol="Cables2" method="mixture by weight">
-      <MaterialFraction fraction="0.88">
+    <CompositeMaterial name="Cables2" density="61.14*mg/cm3" symbol="Cables2" method="mixture by weight">
+      <MaterialFraction fraction="0.87">
         <rMaterial name="materials:Air"/>
       </MaterialFraction>
       <MaterialFraction fraction="0.055">
@@ -88,8 +88,8 @@
         <rMaterial name="materials:Kevlar"/>
       </MaterialFraction>
     </CompositeMaterial>
-    <CompositeMaterial name="Cables3" density="83.68*mg/cm3" symbol="Cables3" method="mixture by weight">
-      <MaterialFraction fraction="0.82">
+    <CompositeMaterial name="Cables3" density="88.5*mg/cm3" symbol="Cables3" method="mixture by weight">
+      <MaterialFraction fraction="0.81">
         <rMaterial name="materials:Air"/>
       </MaterialFraction>
       <MaterialFraction fraction="0.08">
@@ -99,8 +99,8 @@
         <rMaterial name="materials:Kevlar"/>
       </MaterialFraction>
     </CompositeMaterial>
-    <CompositeMaterial name="Cables4" density="109.5*mg/cm3" symbol="Cables4" method="mixture by weight">
-      <MaterialFraction fraction="0.76">
+    <CompositeMaterial name="Cables4" density="115.87*mg/cm3" symbol="Cables4" method="mixture by weight">
+      <MaterialFraction fraction="0.75">
         <rMaterial name="materials:Air"/>
       </MaterialFraction>
       <MaterialFraction fraction="0.105">
@@ -110,8 +110,8 @@
         <rMaterial name="materials:Kevlar"/>
       </MaterialFraction>
     </CompositeMaterial>
-    <CompositeMaterial name="Cables5" density="135.33*mg/cm3" symbol="Cables5" method="mixture by weight">
-      <MaterialFraction fraction="0.70">
+    <CompositeMaterial name="Cables5" density="143.24*mg/cm3" symbol="Cables5" method="mixture by weight">
+      <MaterialFraction fraction="0.69">
         <rMaterial name="materials:Air"/>
       </MaterialFraction>
       <MaterialFraction fraction="0.13">
@@ -121,7 +121,7 @@
         <rMaterial name="materials:Kevlar"/>
       </MaterialFraction>
     </CompositeMaterial>
-    <CompositeMaterial name="Cables6" density="160.16*mg/cm3" symbol="Cables6" method="mixture by weight">
+    <CompositeMaterial name="Cables6" density="169.18*mg/cm3" symbol="Cables6" method="mixture by weight">
       <MaterialFraction fraction="0.64">
         <rMaterial name="materials:Air"/>
       </MaterialFraction>
@@ -132,7 +132,7 @@
         <rMaterial name="materials:Kevlar"/>
       </MaterialFraction>
     </CompositeMaterial>
-    <CompositeMaterial name="Cables7" density="185.98*mg/cm3" symbol="Cables7" method="mixture by weight">
+    <CompositeMaterial name="Cables7" density="196.54*mg/cm3" symbol="Cables7" method="mixture by weight">
       <MaterialFraction fraction="0.58">
         <rMaterial name="materials:Air"/>
       </MaterialFraction>
@@ -143,7 +143,7 @@
         <rMaterial name="materials:Kevlar"/>
       </MaterialFraction>
     </CompositeMaterial>
-    <CompositeMaterial name="ETLPatchPanel" density="454*mg/cm3" symbol="ETLPatchPanel" method="mixture by weight">
+    <CompositeMaterial name="ETLPatchPanel" density="373.407*mg/cm3" symbol="ETLPatchPanel" method="mixture by weight">
       <MaterialFraction fraction="0.4">
         <rMaterial name="materials:Copper"/>
       </MaterialFraction>
